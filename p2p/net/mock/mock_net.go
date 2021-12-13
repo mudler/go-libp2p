@@ -18,8 +18,8 @@ import (
 	"github.com/jbenet/goprocess"
 	goprocessctx "github.com/jbenet/goprocess/context"
 
-	p2putil "github.com/libp2p/go-libp2p-netutil"
 	"github.com/libp2p/go-libp2p-peerstore/pstoremem"
+	p2putil "github.com/libp2p/go-libp2p-testing/netutil"
 	ma "github.com/multiformats/go-multiaddr"
 )
 

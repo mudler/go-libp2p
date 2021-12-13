@@ -5,15 +5,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/libp2p/go-eventbus"
+	mocknet "github.com/libp2p/go-libp2p/p2p/net/mock"
+	"github.com/libp2p/go-libp2p/p2p/protocol/identify"
+
 	"github.com/libp2p/go-libp2p-core/event"
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/network"
 	"github.com/libp2p/go-libp2p-core/peer"
-	p2putil "github.com/libp2p/go-libp2p-netutil"
-	mocknet "github.com/libp2p/go-libp2p/p2p/net/mock"
-	"github.com/libp2p/go-libp2p/p2p/protocol/identify"
 
+	"github.com/libp2p/go-eventbus"
+	p2putil "github.com/libp2p/go-libp2p-testing/netutil"
 	ma "github.com/multiformats/go-multiaddr"
 	"github.com/stretchr/testify/require"
 )

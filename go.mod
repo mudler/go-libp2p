@@ -12,7 +12,7 @@ require (
 	github.com/ipfs/go-cid v0.0.7
 	github.com/ipfs/go-datastore v0.5.0
 	github.com/ipfs/go-ipfs-util v0.0.2
-	github.com/ipfs/go-log/v2 v2.3.0
+	github.com/ipfs/go-log/v2 v2.4.0
 	github.com/jbenet/goprocess v0.1.4
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/koron/go-ssdp v0.0.2 // indirect
@@ -28,12 +28,11 @@ require (
 	github.com/libp2p/go-libp2p-discovery v0.6.0
 	github.com/libp2p/go-libp2p-mplex v0.4.1
 	github.com/libp2p/go-libp2p-nat v0.1.0
-	github.com/libp2p/go-libp2p-netutil v0.1.0
 	github.com/libp2p/go-libp2p-noise v0.3.0
 	github.com/libp2p/go-libp2p-peerstore v0.6.0
 	github.com/libp2p/go-libp2p-quic-transport v0.15.0
 	github.com/libp2p/go-libp2p-swarm v0.8.0
-	github.com/libp2p/go-libp2p-testing v0.5.0
+	github.com/libp2p/go-libp2p-testing v0.6.1-0.20211213091545-6aa944478bd3
 	github.com/libp2p/go-libp2p-tls v0.3.1
 	github.com/libp2p/go-libp2p-transport-upgrader v0.5.0
 	github.com/libp2p/go-libp2p-yamux v0.6.0
