@@ -24,6 +24,7 @@ import (
 	"github.com/ipfs/go-cid"
 	ma "github.com/multiformats/go-multiaddr"
 	manet "github.com/multiformats/go-multiaddr/net"
+	"github.com/stretchr/testify/require"
 )
 
 // test specific parameters
@@ -106,13 +107,9 @@ func (m *mockRouting) FindProvidersAsync(ctx context.Context, cid cid.Cid, limit
 	return ch
 }
 
-// connector
 func connect(t *testing.T, a, b host.Host) {
 	pinfo := peer.AddrInfo{ID: a.ID(), Addrs: a.Addrs()}
-	err := b.Connect(context.Background(), pinfo)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, b.Connect(context.Background(), pinfo))
 }
 
 // and the actual test!
@@ -135,9 +132,6 @@ func isRelayAddr(addr ma.Multiaddr) bool {
 }
 
 func testAutoRelay(t *testing.T, useRelayv2 bool) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	mtab := newMockRoutingTable()
 	makeRouting := func(h host.Host) (*mockRouting, error) {
 		mr := newMockRouting(h, mtab)
@@ -162,51 +156,34 @@ func testAutoRelay(t *testing.T, useRelayv2 bool) {
 			}
 			return addrs
 		}))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer relayHost.Close()
 
 	// instantiate the relay
 	if useRelayv2 {
 		r, err := relayv2.New(relayHost)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		defer r.Close()
 	} else {
 		r, err := relayv1.NewRelay(relayHost)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 		defer r.Close()
 	}
 
 	// advertise the relay
 	relayRouting, err := makeRouting(relayHost)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	relayDiscovery := discovery.NewRoutingDiscovery(relayRouting)
-	autorelay.Advertise(ctx, relayDiscovery)
+	autorelay.Advertise(context.Background(), relayDiscovery)
 
 	// the client hosts
 	h1, err := libp2p.New(libp2p.EnableRelay())
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer h1.Close()
 
 	h2, err := libp2p.New(libp2p.EnableRelay(), libp2p.EnableAutoRelay(), libp2p.Routing(makePeerRouting))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer h2.Close()
-	h3, err := libp2p.New(libp2p.EnableRelay())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer h3.Close()
 
 	// verify that we don't advertise relay addrs initially
 	for _, addr := range h2.Addrs() {
@@ -217,24 +194,27 @@ func testAutoRelay(t *testing.T, useRelayv2 bool) {
 
 	// connect to AutoNAT, have it resolve to private.
 	connect(t, h1, h2)
-	time.Sleep(300 * time.Millisecond)
+
 	privEmitter, _ := h2.EventBus().Emitter(new(event.EvtLocalReachabilityChanged))
 	privEmitter.Emit(event.EvtLocalReachabilityChanged{Reachability: network.ReachabilityPrivate})
+
+	hasRelayAddrs := func(t *testing.T, addrs []ma.Multiaddr) bool {
+		unspecificRelay := ma.StringCast("/p2p-circuit")
+		for _, addr := range addrs {
+			if addr.Equal(unspecificRelay) {
+				t.Fatal("unspecific relay addr advertised")
+			}
+			if isRelayAddr(addr) {
+				return true
+			}
+		}
+		return false
+	}
 	// Wait for detection to do its magic
-	time.Sleep(3000 * time.Millisecond)
+	require.Eventually(t, func() bool { return hasRelayAddrs(t, h2.Addrs()) }, 3*time.Second, 30*time.Millisecond)
 
 	// verify that we now advertise relay addrs (but not unspecific relay addrs)
-	unspecificRelay := ma.StringCast("/p2p-circuit")
-	var haveRelay bool
-	for _, addr := range h2.Addrs() {
-		if addr.Equal(unspecificRelay) {
-			t.Fatal("unspecific relay addr advertised")
-		}
-		if isRelayAddr(addr) {
-			haveRelay = true
-		}
-	}
-	if !haveRelay {
+	if !hasRelayAddrs(t, h2.Addrs()) {
 		t.Fatal("No relay addrs advertised")
 	}
 
@@ -245,26 +225,13 @@ func testAutoRelay(t *testing.T, useRelayv2 bool) {
 			raddrs = append(raddrs, addr)
 		}
 	}
-
-	err = h3.Connect(ctx, peer.AddrInfo{ID: h2.ID(), Addrs: raddrs})
-	if err != nil {
-		t.Fatal(err)
-	}
+	h3, err := libp2p.New(libp2p.EnableRelay())
+	require.NoError(t, err)
+	defer h3.Close()
+	require.NoError(t, h3.Connect(context.Background(), peer.AddrInfo{ID: h2.ID(), Addrs: raddrs}))
 
 	// verify that we have pushed relay addrs to connected peers
-	haveRelay = false
-	for _, addr := range h1.Peerstore().Addrs(h2.ID()) {
-		if addr.Equal(unspecificRelay) {
-			t.Fatal("unspecific relay addr advertised")
-		}
-
-		_, err := addr.ValueForProtocol(ma.P_CIRCUIT)
-		if err == nil {
-			haveRelay = true
-		}
-	}
-
-	if !haveRelay {
+	if !hasRelayAddrs(t, h1.Peerstore().Addrs(h2.ID())) {
 		t.Fatal("No relay addrs pushed")
 	}
 }
