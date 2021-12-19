@@ -74,6 +74,8 @@ type Config struct {
 	Insecure           bool
 	PSK                pnet.PSK
 
+	DialTimeout time.Duration
+
 	RelayCustom bool
 	Relay       bool // should the relay transport be used
 
@@ -135,8 +137,18 @@ func (cfg *Config) makeSwarm() (*swarm.Swarm, error) {
 		return nil, err
 	}
 
+	opts := make([]swarm.Option, 0, 3)
+	if cfg.Reporter != nil {
+		opts = append(opts, swarm.WithMetrics(cfg.Reporter))
+	}
+	if cfg.ConnectionGater != nil {
+		opts = append(opts, swarm.WithConnectionGater(cfg.ConnectionGater))
+	}
+	if cfg.DialTimeout != 0 {
+		opts = append(opts, swarm.WithDialTimeout(cfg.DialTimeout))
+	}
 	// TODO: Make the swarm implementation configurable.
-	return swarm.NewSwarm(pid, cfg.Peerstore, swarm.WithMetrics(cfg.Reporter), swarm.WithConnectionGater(cfg.ConnectionGater))
+	return swarm.NewSwarm(pid, cfg.Peerstore, opts...)
 }
 
 func (cfg *Config) addTransports(h host.Host) (err error) {

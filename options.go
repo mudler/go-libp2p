@@ -461,3 +461,13 @@ func EnableHolePunching(opts ...holepunch.Option) Option {
 		return nil
 	}
 }
+
+func WithDialTimeout(t time.Duration) Option {
+	return func(cfg *Config) error {
+		if t <= 0 {
+			return errors.New("dial timeout needs to be non-negative")
+		}
+		cfg.DialTimeout = t
+		return nil
+	}
+}
