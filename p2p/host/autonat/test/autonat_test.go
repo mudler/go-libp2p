@@ -11,7 +11,8 @@ import (
 	"time"
 
 	"github.com/libp2p/go-libp2p"
-	autonat "github.com/libp2p/go-libp2p-autonat"
+	"github.com/libp2p/go-libp2p/p2p/host/autonat"
+
 	"github.com/libp2p/go-libp2p-core/event"
 	"github.com/libp2p/go-libp2p-core/network"
 )

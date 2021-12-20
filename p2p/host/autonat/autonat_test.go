@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
+	pb "github.com/libp2p/go-libp2p/p2p/host/autonat/pb"
+
 	"github.com/libp2p/go-libp2p-core/event"
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/network"
 	"github.com/libp2p/go-libp2p-core/peer"
-
-	pb "github.com/libp2p/go-libp2p-autonat/pb"
 
 	bhost "github.com/libp2p/go-libp2p-blankhost"
 	swarmt "github.com/libp2p/go-libp2p-swarm/testing"
@@ -252,7 +252,7 @@ func TestAutoNATObservationRecording(t *testing.T) {
 	case <-s.Out():
 		t.Fatal("not expecting a public reachability event")
 	default:
-		//expected
+		// expected
 	}
 
 	addr, _ := ma.NewMultiaddr("/ip4/127.0.0.1/udp/1234")

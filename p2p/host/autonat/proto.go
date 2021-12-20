@@ -1,7 +1,7 @@
 package autonat
 
 import (
-	pb "github.com/libp2p/go-libp2p-autonat/pb"
+	pb "github.com/libp2p/go-libp2p/p2p/host/autonat/pb"
 
 	"github.com/libp2p/go-libp2p-core/peer"
 

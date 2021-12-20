@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	autonat "github.com/libp2p/go-libp2p/p2p/host/autonat"
 	"github.com/libp2p/go-libp2p/p2p/host/pstoremanager"
 	"github.com/libp2p/go-libp2p/p2p/host/relaysvc"
 	relayv2 "github.com/libp2p/go-libp2p/p2p/protocol/circuitv2/relay"
@@ -28,7 +29,6 @@ import (
 
 	addrutil "github.com/libp2p/go-addr-util"
 	"github.com/libp2p/go-eventbus"
-	autonat "github.com/libp2p/go-libp2p-autonat"
 	inat "github.com/libp2p/go-libp2p-nat"
 	"github.com/libp2p/go-netroute"
 

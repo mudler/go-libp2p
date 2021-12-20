@@ -17,6 +17,7 @@ import (
 	"github.com/libp2p/go-libp2p-core/transport"
 	"github.com/libp2p/go-libp2p-peerstore/pstoremem"
 
+	"github.com/libp2p/go-libp2p/p2p/host/autonat"
 	"github.com/libp2p/go-libp2p/p2p/host/autorelay"
 	bhost "github.com/libp2p/go-libp2p/p2p/host/basic"
 	routed "github.com/libp2p/go-libp2p/p2p/host/routed"
@@ -24,7 +25,6 @@ import (
 	relayv2 "github.com/libp2p/go-libp2p/p2p/protocol/circuitv2/relay"
 	"github.com/libp2p/go-libp2p/p2p/protocol/holepunch"
 
-	autonat "github.com/libp2p/go-libp2p-autonat"
 	blankhost "github.com/libp2p/go-libp2p-blankhost"
 	discovery "github.com/libp2p/go-libp2p-discovery"
 	swarm "github.com/libp2p/go-libp2p-swarm"
