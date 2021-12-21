@@ -233,7 +233,7 @@ func DisableRelay() Option {
 }
 
 // EnableRelayService configures libp2p to run a circuit v2 relay,
-// if we dected that we're publicly reachable.
+// if we detect that we're publicly reachable.
 func EnableRelayService(opts ...relayv2.Option) Option {
 	return func(cfg *Config) error {
 		cfg.EnableRelayService = true
